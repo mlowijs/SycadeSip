@@ -12,7 +12,7 @@ exports.start = function (port) {
 	var self = this;
 	this.socket = dgram.createSocket("udp4", function (data, ep) {
 		if (!self.findPeer(ep)) {
-			// Unauthorized
+			// TODO: Unauthorized
 		}
 		
 		PacketFactory.parseRequest(data, function (packet) {
