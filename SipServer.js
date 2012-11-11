@@ -4,7 +4,7 @@ var dgram = require("dgram");
 var PacketFactory = require("./PacketFactory");
 var Utils = require("./Utils");
 var Peer = require("./Peer").Peer;
-var Users = require("./Users.json");
+var Users = require("./config/Users.json");
 
 exports.start = function (port) {
 	this.peers = [];
@@ -36,7 +36,8 @@ exports.registerReceived = function (req, ep) {
 		this.peers.push(peer);
 		
 		resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
-		resp.headers["WWW-Authenticate"] = 'Digest realm="voip", nonce="1234abcd"';
+		resp.headers["WWW-Authenticate"] = 'Digest realm="sip", ' +
+			'nonce="' + Utils.randomHash() + '"';
 	} else { // Client is trying to authenticate
 		var password = Users[req.authorization.username];
 		var digest = this.createDigest(req, password);

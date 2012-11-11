@@ -9,6 +9,8 @@ exports.hash = function (data, algorithm) {
 	return hasher.digest("hex");
 };
 
-exports.randomHash = function () {
-	return crypto.randomBytes(16).toString("hex");
+exports.randomHash = function (bytes) {
+	bytes = bytes || 16;
+	
+	return crypto.randomBytes(bytes).toString("hex");
 };
