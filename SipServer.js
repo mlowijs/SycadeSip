@@ -43,8 +43,8 @@ exports.registerReceived = function (req, ep) {
 	if (!resp) {
 		resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
 		
-		resp.headers["WWW-Authenticate"] = 'Digest realm="sip", ' +
-			'nonce="' + Utils.randomHash() + '"';
+		resp.headers["WWW-Authenticate"] = 'Digest realm="sip", nonce="' +
+			Utils.randomHash() + '"';
 	}
 	
 	// Send response
