@@ -10,11 +10,7 @@ exports.start = function (port) {
 	this.peers = [];
 	
 	var self = this;
-	this.socket = dgram.createSocket("udp4", function (data, ep) {
-		if (!self.findPeer(ep)) {
-			// TODO: Unauthorized
-		}
-		
+	this.socket = dgram.createSocket("udp4", function (data, ep) {		
 		PacketFactory.parseRequest(data, function (packet) {
 			switch (packet.request.method) {
 				case "REGISTER":
@@ -31,29 +27,31 @@ exports.registerReceived = function (req, ep) {
 	console.log(req);
 	var resp = undefined;
 	
-	if (!req.headers["Authorization"]) { // Client is not authenticated
-		var peer = new Peer(ep);
-		this.peers.push(peer);
+	// Authorizing
+	if (req.headers["Authorization"]) {
+		var password = Users[req.authorization.username];
 		
+		// Password correct?
+		if (this.validateDigest(req, password)) {
+			this.peers.push(new Peer(ep));
+			
+			resp = PacketFactory.createResponse(req, ep, "200 OK");
+		}
+	}
+
+	// Invalid credentials or not authorizing
+	if (!resp) {
 		resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
+		
 		resp.headers["WWW-Authenticate"] = 'Digest realm="sip", ' +
 			'nonce="' + Utils.randomHash() + '"';
-	} else { // Client is trying to authenticate
-		var password = Users[req.authorization.username];
-		var digest = this.createDigest(req, password);
-		
-		if (digest == req.authorization.response) { // Authenticated
-			resp = PacketFactory.createResponse(req, ep, "200 OK");
-		} else { // Authentication failed
-			resp = PacketFactory.createResponse(req, ep, "4xx XXX");
-		}
 	}
 	
 	// Send response
 	this.send(resp, ep);
 };
 
-exports.createDigest = function (req, password) {
+exports.validateDigest = function (req, password) {
 	// Create HA1 and HA2
 	var ha1 = req.authorization.username + ":" + req.authorization.realm + ":" +
 		password;
@@ -62,8 +60,10 @@ exports.createDigest = function (req, password) {
 	var ha2 = req.request.method + ":" + req.authorization.uri;
 	ha2 = Utils.hash(ha2);
 	
-	// Return digest
-	return Utils.hash(ha1 + ":" + req.authorization.nonce + ":" + ha2);
+	// Create digest	
+	var digest = Utils.hash(ha1 + ":" + req.authorization.nonce + ":" + ha2);
+
+	return (req.authorization.response == digest);
 };
 
 exports.findPeer = function (ep) {
