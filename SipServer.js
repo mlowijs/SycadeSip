@@ -33,7 +33,7 @@ exports.registerReceived = function (req, ep) {
 		
 		// Password correct?
 		if (this.validateDigest(req, password)) {
-			this.peers.push(new Peer(ep));
+			this.peers.push(new Peer(req, ep));
 			
 			resp = PacketFactory.createResponse(req, ep, "200 OK");
 		}

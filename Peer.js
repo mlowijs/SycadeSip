@@ -1,4 +1,5 @@
-var Peer = function (ep) {
+var Peer = function (req, ep) {
+	this.contact = req.headers["Contact"];
 	this.endPoint = ep;
 };
 
