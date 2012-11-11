@@ -19,6 +19,7 @@ exports.parseRequest = function (data, callback) {
 	switch (request.method) {
 		case "REGISTER":
 			callback(new RegisterRequest(request, data, lines));
+			break;
 	}
 };
 
