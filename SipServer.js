@@ -36,6 +36,7 @@ exports.registerReceived = function (req, ep) {
 			this.peers.push(new Peer(req, ep));
 			
 			resp = PacketFactory.createResponse(req, ep, "200 OK");
+			resp.headers["Contact"] = req.headers["Contact"];
 		}
 	}
 

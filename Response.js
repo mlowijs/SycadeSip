@@ -13,8 +13,8 @@ Response.prototype.toString = function () {
 	}
 	
 	buffer += "Content-Length: " + this.content.length + "\r\n\r\n";
-// 	if (this.content)
-// 		buffer += this.content + "\r\n";
+	if (this.content)
+		buffer += this.content + "\r\n";
 	
 	return buffer;
 };
