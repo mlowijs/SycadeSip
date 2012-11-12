@@ -16,6 +16,9 @@ exports.start = function (port) {
 				case "REGISTER":
 					self.registerReceived(packet, ep);
 					break;
+				case "PUBLISH":
+					self.publishReceived(packet, ep);
+					break;
 			}
 		});
 	});
@@ -23,8 +26,15 @@ exports.start = function (port) {
 	this.socket.bind(port);
 };
 
-exports.registerReceived = function (req, ep) {
+exports.publishReceived = function (req, ep) {
 	console.log(req);
+	
+	var resp = PacketFactory.createResponse(req, ep, "489 Bad Event");
+	
+	this.send(resp, ep);
+};
+
+exports.registerReceived = function (req, ep) {
 	var resp = undefined;
 	
 	// Authorizing

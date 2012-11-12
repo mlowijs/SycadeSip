@@ -1,4 +1,5 @@
 var Utils = require("./Utils");
+var Request = require("./Request").Request;
 var RegisterRequest = require("./RegisterRequest").RegisterRequest;
 var Response = require("./Response").Response;
 
@@ -20,6 +21,8 @@ exports.parseRequest = function (data, callback) {
 		case "REGISTER":
 			callback(new RegisterRequest(request, data, lines));
 			break;
+		default:
+			callback(new Request(request, data, lines));
 	}
 };
 

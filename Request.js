@@ -12,7 +12,7 @@ var Request = function (request, data, lines) {
 	
 	// Set content if it exists
 	if (this.headers["Content-Length"] > 0)
-		this.content = data.substr(-this.headers["Content-Length"]);
+		this.content = data.substr(-this.headers["Content-Length"] + 2);
 };
 
 exports.Request = Request;
