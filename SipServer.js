@@ -19,6 +19,9 @@ exports.start = function (port) {
 				case "PUBLISH":
 					self.publishReceived(packet, ep);
 					break;
+				case "SUBSCRIBE":
+					self.subscribeReceived(packet, ep);
+					break;
 			}
 		});
 	});
@@ -26,9 +29,13 @@ exports.start = function (port) {
 	this.socket.bind(port);
 };
 
-exports.publishReceived = function (req, ep) {
-	console.log(req);
+exports.subscribeReceived = function (req, ep) {	
+	var resp = PacketFactory.createResponse(req, ep, "200 OK");
 	
+	this.send(resp, ep);
+};
+
+exports.publishReceived = function (req, ep) {	
 	var resp = PacketFactory.createResponse(req, ep, "489 Bad Event");
 	
 	this.send(resp, ep);
