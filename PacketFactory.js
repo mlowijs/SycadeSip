@@ -1,6 +1,7 @@
 var Utils = require("./Utils");
 var Request = require("./Request").Request;
 var RegisterRequest = require("./RegisterRequest").RegisterRequest;
+var InviteRequest = require("./InviteRequest").InviteRequest;
 var Response = require("./Response").Response;
 
 exports.parseRequest = function (data, callback) {
@@ -21,6 +22,9 @@ exports.parseRequest = function (data, callback) {
 		case "REGISTER":
 			callback(new RegisterRequest(request, data, lines));
 			break;
+		case "INVITE":
+			callback(new InviteRequest(request, data, lines));
+			break;
 		default:
 			callback(new Request(request, data, lines));
 	}
@@ -34,7 +38,6 @@ exports.createResponse = function (req, ep, status) {
 		";received=" + ep.address + ";rport=" + ep.port;
 		
 	resp.headers["From"] = req.headers["From"];
-	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	resp.headers["Call-ID"] = req.headers["Call-ID"];
 	resp.headers["CSeq"] = req.headers["CSeq"];
 	resp.headers["Server"] = "SycadeSip 0.0.1";

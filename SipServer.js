@@ -22,6 +22,9 @@ exports.start = function (port) {
 				case "SUBSCRIBE":
 					self.subscribeReceived(packet, ep);
 					break;
+				case "INVITE":
+					self.inviteReceived(packet, ep);
+					break;
 			}
 		});
 	});
@@ -29,14 +32,20 @@ exports.start = function (port) {
 	this.socket.bind(port);
 };
 
+exports.inviteReceived = function (req, ep) {
+	console.log("GOT INVITE!");
+};
+
 exports.subscribeReceived = function (req, ep) {	
 	var resp = PacketFactory.createResponse(req, ep, "200 OK");
+	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
 	this.send(resp, ep);
 };
 
 exports.publishReceived = function (req, ep) {	
 	var resp = PacketFactory.createResponse(req, ep, "489 Bad Event");
+	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
 	this.send(resp, ep);
 };
@@ -66,6 +75,7 @@ exports.registerReceived = function (req, ep) {
 	}
 	
 	// Send response
+	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	this.send(resp, ep);
 };
 
