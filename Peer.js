@@ -1,6 +1,5 @@
-var Peer = function (req, ep) {
+var Peer = function (req) {
 	this.contact = req.headers["Contact"];
-	this.endPoint = ep;
 };
 
 exports.Peer = Peer;

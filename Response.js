@@ -20,8 +20,8 @@ Response.prototype.toString = function () {
 	return buffer;
 };
 
-Response.prototype.getBuffer = function () {
-	return new Buffer(this.toString());
+Response.prototype.getBuffer = function (callback) {
+	callback(new Buffer(this.toString()));
 }
 
 exports.Response = Response;

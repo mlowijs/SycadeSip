@@ -14,6 +14,10 @@ exports.start = function (port) {
 	var self = this;
 	this.socket = dgram.createSocket("udp4", function (data, ep) {		
 		PacketFactory.parseRequest(data, function (packet) {
+			if (!self.findPeer(packet) && packet.request.method != "REGISTER") {
+				// 401 Unauthorized
+			}
+			
 			switch (packet.request.method) {
 				case "REGISTER":
 					self.registerReceived(packet, ep);
@@ -90,7 +94,7 @@ exports.registerReceived = function (req, ep) {
 		
 		// Password correct?
 		if (this.validateDigest(req, password)) {
-			this.peers.push(new Peer(req, ep));
+			this.peers.push(new Peer(req));
 			
 			resp = PacketFactory.createResponse(req, ep, "200 OK");
 			resp.headers["Contact"] = req.headers["Contact"];
@@ -125,20 +129,23 @@ exports.validateDigest = function (req, password) {
 	return (req.authorization.response == digest);
 };
 
-exports.findPeer = function (ep) {
-	for (var i = 0; i < this.peers.length; i++) {
-		var endPoint = this.peers[i].endPoint;
-		
-		if (endPoint.address == ep.address && endPoint.port == ep.port)
-			return this.peers[i];
-	}
-	
-	return false;
+exports.findPeer = function (req) {
+	return true; // BYPASS
+
+	// for (var i = 0; i < this.peers.length; i++) {
+// 		var endPoint = this.peers[i].endPoint;
+// 		
+// 		if (endPoint.address == ep.address && endPoint.port == ep.port)
+// 			return this.peers[i];
+// 	}
+// 	
+// 	return false;
 };
 
 exports.send = function (resp) {
-	var buffer = resp.getBuffer();
-	
-	this.socket.send(buffer, 0, buffer.length, resp.endPoint.port,
-		resp.endPoint.address);
+	var self = this;
+	resp.getBuffer(function (buffer) {
+		self.socket.send(buffer, 0, buffer.length, resp.endPoint.port,
+			resp.endPoint.address);
+	});
 };
