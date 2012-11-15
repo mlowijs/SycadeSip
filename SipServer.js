@@ -6,6 +6,7 @@ var PacketFactory = require("./PacketFactory");
 var Utils = require("./Utils");
 var Peer = require("./Peer").Peer;
 var Users = require("./config/Users.json");
+var Context = require("./Context").Context;
 
 exports.start = function (port) {
 	this.peers = [];
@@ -35,7 +36,7 @@ exports.start = function (port) {
 
 exports.inviteReceived = function (req, ep) {
 	// Create call context
-	var context = undefined,
+	var context = new Context(this, req, ep),
 		username = req.to.username,
 		extFound = false;
 	
@@ -61,8 +62,10 @@ exports.inviteReceived = function (req, ep) {
 	// No extension found, send 404 Not Found
 	if (!extFound) {
 		var resp = PacketFactory.createResponse(req, ep, "404 Not Found");
+		resp.headers["To"] = req.headers["To"];
+		resp.headers["Contact"] = req.headers["Contact"];
 		
-// 		this.send(resp);
+		this.send(resp);
 	}
 };
 
