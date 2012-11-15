@@ -10,7 +10,7 @@ Context.prototype.accept = function () {
 Context.prototype.call = function (user) {
 };
 
-Context.prototype.cancel = function () {
+Context.prototype.end = function () {
 };
 
 exports.Context = Context;

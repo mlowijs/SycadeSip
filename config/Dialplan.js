@@ -1,11 +1,11 @@
 Dialplan = [
 	{
 		pattern: "200",
-		plan: function (ctx) {
+		plan: function () {
 			console.log("in dialplan");
 			
-			// Cancel this call
-			ctx.cancel();
+			// End this call
+			this.end();
 		}
 	}
 ];

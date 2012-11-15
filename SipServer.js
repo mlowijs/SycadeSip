@@ -35,9 +35,7 @@ exports.start = function (port) {
 };
 
 exports.inviteReceived = function (req, ep) {
-	// Create call context
-	var context = new Context(this, req, ep),
-		username = req.to.username,
+	var username = req.to.username,
 		extFound = false;
 	
 	// Find extension and execute dialplan
@@ -55,7 +53,7 @@ exports.inviteReceived = function (req, ep) {
 			this.send(resp);
 			
 			// Execute dialplan
-			ext.plan(context);
+			ext.plan.call(new Context(this, req, ep));
 		}
 	}, this);
 	
