@@ -1,5 +1,6 @@
-var Response = function (response) {
+var Response = function (response, ep) {
 	this.response = response;
+	this.endPoint = ep;
 	
 	this.headers = {};
 	this.content = "";

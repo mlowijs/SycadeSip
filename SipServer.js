@@ -1,4 +1,5 @@
 require("./Extensions");
+require("./config/Dialplan.js");
 
 var dgram = require("dgram");
 var PacketFactory = require("./PacketFactory");
@@ -33,21 +34,50 @@ exports.start = function (port) {
 };
 
 exports.inviteReceived = function (req, ep) {
-	console.log("GOT INVITE!");
+	// Create call context
+	var context = undefined,
+		username = req.to.username,
+		extFound = false;
+	
+	// Find extension and execute dialplan
+	Dialplan.forEach(function (ext) {
+		// Test regex or string compare
+		if (ext.pattern.test && ext.pattern.test(username) || ext.pattern == username ) {
+			// Extension found!
+			extFound = true;
+			
+			// Send 100 Trying
+			var resp = PacketFactory.createResponse(req, ep, "100 Trying");
+			resp.headers["To"] = req.headers["To"];
+			resp.headers["Contact"] = req.headers["Contact"];
+			
+			this.send(resp);
+			
+			// Execute dialplan
+			ext.plan(context);
+		}
+	}, this);
+	
+	// No extension found, send 404 Not Found
+	if (!extFound) {
+		var resp = PacketFactory.createResponse(req, ep, "404 Not Found");
+		
+// 		this.send(resp);
+	}
 };
 
 exports.subscribeReceived = function (req, ep) {	
 	var resp = PacketFactory.createResponse(req, ep, "200 OK");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
-	this.send(resp, ep);
+	this.send(resp);
 };
 
 exports.publishReceived = function (req, ep) {	
 	var resp = PacketFactory.createResponse(req, ep, "489 Bad Event");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
-	this.send(resp, ep);
+	this.send(resp);
 };
 
 exports.registerReceived = function (req, ep) {
@@ -76,7 +106,7 @@ exports.registerReceived = function (req, ep) {
 	
 	// Send response
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
-	this.send(resp, ep);
+	this.send(resp);
 };
 
 exports.validateDigest = function (req, password) {
@@ -105,8 +135,9 @@ exports.findPeer = function (ep) {
 	return false;
 };
 
-exports.send = function (resp, ep) {
+exports.send = function (resp) {
 	var buffer = resp.getBuffer();
 	
-	this.socket.send(buffer, 0, buffer.length, ep.port, ep.address);
+	this.socket.send(buffer, 0, buffer.length, resp.endPoint.port,
+		resp.endPoint.address);
 };

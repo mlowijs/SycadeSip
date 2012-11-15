@@ -32,7 +32,7 @@ exports.parseRequest = function (data, callback) {
 
 exports.createResponse = function (req, ep, status) {	
 	// Create response packet with response line
-	var resp = new Response(req.request.protocol + " " + status);
+	var resp = new Response(req.request.protocol + " " + status, ep);
 	
 	resp.headers["Via"] = req.headers["Via"] +
 		";received=" + ep.address + ";rport=" + ep.port;
