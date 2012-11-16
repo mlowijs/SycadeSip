@@ -7,10 +7,10 @@ SessionDescription.prototype.toString = function () {
 	
 //	var timestamp = Math.round(Date.now() / 1000);
 	
-	buffer += "o=" + this.request.from.username + " 0 0 IN IP4 " +
-		this.request.from.host + "\r\n"; // Originator
+	buffer += "o=" + this.request.to.extension + " 0 0 IN IP4 localhost\r\n"; // +
+	//	this.request.from.host + "\r\n"; // Originator
 	buffer += "s=SycadeSip Session\r\n"; // Session name
-	buffer += "t=0 0"; // Time description
+	buffer += "t=1 1"; // Time description
 	
 	return buffer;
 };
