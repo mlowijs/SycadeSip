@@ -13,16 +13,20 @@ var Context = function (server, request, endPoint) {
 Context.prototype.accept = function () {
 	if (this.ended)
 		return false;
+
+	// Create a session description	
+	this.sessionDescription = new SessionDescription();
 	
 	var resp = PacketFactory.createResponse(this.request, this.endPoint, "200 OK");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
+	resp.headers["Content-Type"] = "application/sdp";
 	if (req.headers["Contact"]) // TODO: fix this
 		resp.headers["Contact"] = req.headers["Contact"];
-	resp.headers["Content-Type"] = "application/sdp";
-	resp.content = new SessionDescription().toString();
+
+	// Add session description as content	
+	resp.content = this.sessionDescription.toString();
 	
 	this.server.send(resp);
-	
 	this.accepted = true;
 };
 
