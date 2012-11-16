@@ -4,8 +4,8 @@ Dialplan = [
 		plan: function () {
 			console.log("in dialplan");
 			
-			// End this call
-			this.end();
+			// Accept the call
+			this.accept();
 		}
 	}
 ];
