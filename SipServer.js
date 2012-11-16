@@ -1,12 +1,15 @@
 require("./Extensions");
-require("./config/Dialplan.js");
 
 var dgram = require("dgram");
 var PacketFactory = require("./PacketFactory");
 var Utils = require("./Utils");
 var Peer = require("./Peer").Peer;
-var Users = require("./config/Users.json");
 var Context = require("./Context").Context;
+
+// Configuration files
+require("./config/Dialplan.js");
+Settings = require("./config/Settings.json");
+Users = require("./config/Users.json");
 
 exports.start = function (port) {
 	this.peers = [];
