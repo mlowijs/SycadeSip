@@ -1,5 +1,6 @@
 var PacketFactory = require("./PacketFactory");
 var SessionDescription = require("./SessionDescription").SessionDescription;
+var Utils = require("./Utils");
 
 var Context = function (server, request, endPoint) {
 	this.server = server;
@@ -18,10 +19,10 @@ Context.prototype.accept = function () {
 	this.sessionDescription = new SessionDescription(this.request);
 	
 	var resp = PacketFactory.createResponse(this.request, this.endPoint, "200 OK");
-	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
+	resp.headers["To"] = this.request.headers["To"] + ";tag=" + Utils.randomHash();
 	resp.headers["Content-Type"] = "application/sdp";
-	if (req.headers["Contact"]) // TODO: fix this
-		resp.headers["Contact"] = req.headers["Contact"];
+	if (this.request.headers["Contact"]) // TODO: fix this
+		resp.headers["Contact"] = this.request.headers["Contact"];
 
 	// Add session description as content	
 	resp.content = this.sessionDescription.toString();
