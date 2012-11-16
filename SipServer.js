@@ -12,24 +12,36 @@ exports.start = function (port) {
 	this.peers = [];
 	
 	var self = this;
-	this.socket = dgram.createSocket("udp4", function (data, ep) {		
-		PacketFactory.parseRequest(data, function (packet) {
-			if (!self.findPeer(packet) && packet.request.method != "REGISTER") {
-				// 401 Unauthorized
+	this.socket = dgram.createSocket("udp4", function (data, ep) {	
+		if (data.length == 0) // Drop data if length == 0
+			return;
+				
+		PacketFactory.parseRequest(data, function (req) {
+			if (!self.findPeer(req)) {
+				if (!self.authorize(req, ep)) {
+					var resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
+					resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
+					resp.headers["WWW-Authenticate"] = 'Digest realm="sip", nonce="' +
+						Utils.randomHash() + '"';
+					
+					self.send(resp);
+					
+					return;
+				}
 			}
 			
-			switch (packet.request.method) {
+			switch (req.request.method) {
 				case "REGISTER":
-					self.registerReceived(packet, ep);
+					self.registerReceived(req, ep);
 					break;
 				case "PUBLISH":
-					self.publishReceived(packet, ep);
+					self.publishReceived(req, ep);
 					break;
 				case "SUBSCRIBE":
-					self.subscribeReceived(packet, ep);
+					self.subscribeReceived(req, ep);
 					break;
 				case "INVITE":
-					self.inviteReceived(packet, ep);
+					self.inviteReceived(req, ep);
 					break;
 			}
 		});
@@ -38,14 +50,28 @@ exports.start = function (port) {
 	this.socket.bind(port);
 };
 
+exports.authorize = function (req, ep) {
+	if (req.headers["Authorization"]) {
+		var password = Users[req.authorization.username];
+		
+		if (this.validateDigest(req, password)) {
+			this.peers.push(new Peer(req));
+			
+			return true;
+		}
+	}
+	
+	return false;
+};
+
 exports.inviteReceived = function (req, ep) {
-	var username = req.to.username,
+	var invExt = req.to.extension,
 		extFound = false;
 	
 	// Find extension and execute dialplan
 	Dialplan.forEach(function (ext) {
 		// Test regex or string compare
-		if (ext.pattern.test && ext.pattern.test(username) || ext.pattern == username ) {
+		if (ext.pattern.test && ext.pattern.test(invExt) || ext.pattern == invExt ) {
 			// Extension found!
 			extFound = true;
 			
@@ -86,31 +112,14 @@ exports.publishReceived = function (req, ep) {
 };
 
 exports.registerReceived = function (req, ep) {
-	var resp = undefined;
+	var resp = PacketFactory.createResponse(req, ep, "200 OK");
 	
-	// Authorizing
-	if (req.headers["Authorization"]) {
-		var password = Users[req.authorization.username];
-		
-		// Password correct?
-		if (this.validateDigest(req, password)) {
-			this.peers.push(new Peer(req));
-			
-			resp = PacketFactory.createResponse(req, ep, "200 OK");
-			resp.headers["Contact"] = req.headers["Contact"];
-		}
-	}
-
-	// Invalid credentials or not authorizing
-	if (!resp) {
-		resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
-		
-		resp.headers["WWW-Authenticate"] = 'Digest realm="sip", nonce="' +
-			Utils.randomHash() + '"';
-	}
+	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
+	resp.headers["Expires"] = 1800;
+	if (req.headers["Contact"]) // TODO: fix this
+		resp.headers["Contact"] = req.headers["Contact"] + ";expires=1800";
 	
 	// Send response
-	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	this.send(resp);
 };
 
@@ -130,16 +139,15 @@ exports.validateDigest = function (req, password) {
 };
 
 exports.findPeer = function (req) {
-	return true; // BYPASS
-
-	// for (var i = 0; i < this.peers.length; i++) {
-// 		var endPoint = this.peers[i].endPoint;
-// 		
-// 		if (endPoint.address == ep.address && endPoint.port == ep.port)
-// 			return this.peers[i];
-// 	}
-// 	
-// 	return false;
+	for (var i = 0; i < this.peers.length; i++) {
+ 		var from = this.peers[i].from;
+ 		
+ 		if (from.username == req.from.username && from.host == req.from.host
+ 			&& from.port == req.from.port)
+ 			return this.peers[i];
+ 	}
+ 	
+ 	return false;
 };
 
 exports.send = function (resp) {

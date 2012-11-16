@@ -1,5 +1,5 @@
 var Peer = function (req) {
-	this.contact = req.headers["Contact"];
+	this.from = req.from;
 };
 
 exports.Peer = Peer;

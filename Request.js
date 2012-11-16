@@ -1,3 +1,5 @@
+var Utils = require("./Utils");
+
 var Request = function (request, data, lines) {
 	this.request = request;
 	
@@ -13,6 +15,20 @@ var Request = function (request, data, lines) {
 	// Set content if it exists
 	if (this.headers["Content-Length"] > 0)
 		this.content = data.substr(-this.headers["Content-Length"] + 2);
+		
+	var re, matches;
+	
+	// Authorization
+	if (this.headers["Authorization"]) {
+		this.authorization = {};
+		re = /(\w+)="?([^"]+)/g;
+		
+		while ((matches = re.exec(this.headers["Authorization"])) !== null)
+			this.authorization[matches[1]] = matches[2];
+	}
+	
+	// From
+	this.from = Utils.parseAddress(this.headers["From"]);
 };
 
 exports.Request = Request;

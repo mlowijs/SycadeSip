@@ -1,6 +1,5 @@
 var Utils = require("./Utils");
 var Request = require("./Request").Request;
-var RegisterRequest = require("./RegisterRequest").RegisterRequest;
 var InviteRequest = require("./InviteRequest").InviteRequest;
 var Response = require("./Response").Response;
 
@@ -17,11 +16,11 @@ exports.parseRequest = function (data, callback) {
 		protocol: reqLine[2]
 	};
 	
+	console.log(data);
+	console.log(data.length);
+	
 	// Create packet based on request method
 	switch (request.method) {
-		case "REGISTER":
-			callback(new RegisterRequest(request, data, lines));
-			break;
 		case "INVITE":
 			callback(new InviteRequest(request, data, lines));
 			break;
