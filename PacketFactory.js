@@ -4,7 +4,6 @@ var InviteRequest = require("./InviteRequest").InviteRequest;
 var Response = require("./Response").Response;
 
 exports.parseRequest = function (data, callback) {
-	var data = data.toString().trim();
 	var lines = data.split("\r\n");
 	
 	// Set request
@@ -15,9 +14,6 @@ exports.parseRequest = function (data, callback) {
 		url: reqLine[1],
 		protocol: reqLine[2]
 	};
-	
-	console.log(data);
-	console.log(data.length);
 	
 	// Create packet based on request method
 	switch (request.method) {

@@ -12,10 +12,15 @@ exports.start = function (port) {
 	this.peers = [];
 	
 	var self = this;
-	this.socket = dgram.createSocket("udp4", function (data, ep) {	
-		if (data.length == 0) // Drop data if length == 0
+	this.socket = dgram.createSocket("udp4", function (data, ep) {
+		// Create string from buffer
+		data = data.toString().trim();
+		
+		// Drop useless data
+		if (data.length == 0)
 			return;
-				
+		
+		// Parse data into request packet
 		PacketFactory.parseRequest(data, function (req) {
 			if (!self.findPeer(req)) {
 				if (!self.authorize(req, ep)) {
@@ -48,20 +53,6 @@ exports.start = function (port) {
 	});
 	
 	this.socket.bind(port);
-};
-
-exports.authorize = function (req, ep) {
-	if (req.headers["Authorization"]) {
-		var password = Users[req.authorization.username];
-		
-		if (this.validateDigest(req, password)) {
-			this.peers.push(new Peer(req));
-			
-			return true;
-		}
-	}
-	
-	return false;
 };
 
 exports.inviteReceived = function (req, ep) {
@@ -121,6 +112,20 @@ exports.registerReceived = function (req, ep) {
 	
 	// Send response
 	this.send(resp);
+};
+
+exports.authorize = function (req, ep) {
+	if (req.headers["Authorization"]) {
+		var password = Users[req.authorization.username];
+		
+		if (this.validateDigest(req, password)) {
+			this.peers.push(new Peer(req));
+			
+			return true;
+		}
+	}
+	
+	return false;
 };
 
 exports.validateDigest = function (req, password) {
