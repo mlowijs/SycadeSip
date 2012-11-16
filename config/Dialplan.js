@@ -1,6 +1,6 @@
 Dialplan = [
 	{
-		pattern: "200",
+		extension: "200",
 		plan: function () {
 			console.log("in dialplan");
 			

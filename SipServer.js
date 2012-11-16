@@ -65,13 +65,13 @@ exports.authorize = function (req, ep) {
 };
 
 exports.inviteReceived = function (req, ep) {
-	var invExt = req.to.extension,
+	var iExt = req.to.extension,
 		extFound = false;
 	
 	// Find extension and execute dialplan
 	Dialplan.forEach(function (ext) {
 		// Test regex or string compare
-		if (ext.pattern.test && ext.pattern.test(invExt) || ext.pattern == invExt ) {
+		if (ext.extension.test && ext.extension.test(iExt) || ext.extension == iExt ) {
 			// Extension found!
 			extFound = true;
 			
