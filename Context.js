@@ -15,7 +15,7 @@ Context.prototype.accept = function () {
 		return false;
 
 	// Create a session description	
-	this.sessionDescription = new SessionDescription();
+	this.sessionDescription = new SessionDescription(this.request);
 	
 	var resp = PacketFactory.createResponse(this.request, this.endPoint, "200 OK");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
