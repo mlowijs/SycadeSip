@@ -13,7 +13,7 @@ Response.prototype.toString = function () {
 		buffer += header + ": " + this.headers[header] + "\r\n";
 	}
 	
-	buffer += "Content-Length: " + this.content.length + "\r\n\r\n";
+	buffer += "Content-Length: " + this.content.length + 2 + "\r\n\r\n";
 	if (this.content)
 		buffer += this.content + "\r\n";
 	
