@@ -107,7 +107,6 @@ exports.publishReceived = function (req, ep) {
 
 exports.registerReceived = function (req, ep) {
 	var resp = PacketFactory.createResponse(req, ep, "200 OK");
-	
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	resp.headers["Expires"] = 1800;
 	if (req.headers["Contact"]) // TODO: fix this

@@ -1,34 +1,38 @@
 var Utils = require("./Utils");
 
-var Request = function (request, data, lines) {
-	this.request = request;
-	
-	// Set headers
+var Request = function () {
 	this.headers = {};
+};
+
+Request.parse = function (request, data, lines) {
+	var req = new Request();
 	
 	for (var i = 1; i < lines.length; i++) {
 		var kvp = lines[i].split(":", 2);
 		
-		this.headers[kvp[0]] = kvp[1].trim();
+		req.headers[kvp[0]] = kvp[1].trim();
 	}
 	
 	// Set content if it exists
-	if (this.headers["Content-Length"] > 0)
-		this.content = data.substr(-this.headers["Content-Length"] + 2);
+	if (req.headers["Content-Length"] > 0)
+		req.content = data.substr(-req.headers["Content-Length"] + 2);
 		
 	var re, matches;
 	
 	// Authorization
-	if (this.headers["Authorization"]) {
-		this.authorization = {};
+	if (req.headers["Authorization"]) {
+		req.authorization = {};
 		re = /(\w+)="?([^"]+)/g;
 		
-		while ((matches = re.exec(this.headers["Authorization"])) !== null)
-			this.authorization[matches[1]] = matches[2];
+		while ((matches = re.exec(req.headers["Authorization"])) !== null)
+			req.authorization[matches[1]] = matches[2];
 	}
 	
-	// From
-	this.from = Utils.parseAddress(this.headers["From"]);
+	// Interesting properties
+	req.from = Utils.parseAddress(this.headers["From"]);
+	req.to = Utils.parseAddress(this.headers["To"]);
+	
+	return req;
 };
 
 exports.Request = Request;

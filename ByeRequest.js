@@ -1,4 +1,8 @@
+var Request = require("./Request").Request;
+
 var ByeRequest = function () {
+	Request.call(this);
+	
 	
 };
 
