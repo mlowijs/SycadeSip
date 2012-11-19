@@ -36,7 +36,8 @@ Context.prototype.call = function (user) {
 		return false;
 };
 
-Context.prototype.end = function () {		
+Context.prototype.end = function () {
+
 	this.ended = true;
 };
 

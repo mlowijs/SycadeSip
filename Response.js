@@ -1,9 +1,19 @@
-var Response = function (response, endPoint) {
-	this.response = response;
+var Response = function (request, endPoint, status) {
 	this.endPoint = endPoint;
-	
 	this.headers = {};
 	this.content = "";
+
+	// Set status line
+	this.response = request.request.protocol + " " + status;
+	
+	// Set headers
+	this.headers["Via"] = request.headers["Via"] +
+		";received=" + endPoint.address + ";rport=" + endPoint.port;
+		
+	this.headers["From"] = request.headers["From"];
+	this.headers["Call-ID"] = request.headers["Call-ID"];
+	this.headers["CSeq"] = request.headers["CSeq"];
+	this.headers["Server"] = "SycadeSip 0.0.1";
 };
 
 Response.prototype.toString = function () {

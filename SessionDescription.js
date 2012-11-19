@@ -5,12 +5,16 @@ var SessionDescription = function (request) {
 SessionDescription.prototype.toString = function () {
 	var buffer = "v=0\r\n"; // Protocol version
 	
-//	var timestamp = Math.round(Date.now() / 1000);
-	
-	buffer += "o=" + this.request.to.extension + " 0 0 IN IP4 localhost\r\n"; // +
-	//	this.request.from.host + "\r\n"; // Originator
+	buffer += "o=" + this.request.to.extension + " 1 1 IN IP4 localhost\r\n";
 	buffer += "s=SycadeSip Session\r\n"; // Session name
-	buffer += "t=1 1"; // Time description
+	buffer += "c=IN IP4 localhost\r\n";
+	buffer += "t=0 0\r\n"; // Time description
+	buffer += "m=audio 8001 RTP/AVP 0 8 101\r\n";
+	buffer += "a=rtpmap:0 PCMU/8000\r\n";
+	buffer += "a=rtpmap:8 PCMA/8000\r\n";
+	buffer += "a=rtpmap:101 telephone-event/8000\r\n";
+// 	buffer += "a=fmtp:101 0-15\r\n";
+	buffer += "a=sendrecv";
 	
 	return buffer;
 };

@@ -1,6 +1,7 @@
 var Utils = require("./Utils");
 var Request = require("./Request").Request;
 var InviteRequest = require("./InviteRequest").InviteRequest;
+var ByeRequest = require("./ByeRequest").ByeRequest;
 var Response = require("./Response").Response;
 
 exports.parseRequest = function (data, callback) {
@@ -26,16 +27,9 @@ exports.parseRequest = function (data, callback) {
 };
 
 exports.createResponse = function (req, ep, status) {	
-	// Create response packet with response line
-	var resp = new Response(req.request.protocol + " " + status, ep);
-	
-	resp.headers["Via"] = req.headers["Via"] +
-		";received=" + ep.address + ";rport=" + ep.port;
-		
-	resp.headers["From"] = req.headers["From"];
-	resp.headers["Call-ID"] = req.headers["Call-ID"];
-	resp.headers["CSeq"] = req.headers["CSeq"];
-	resp.headers["Server"] = "SycadeSip 0.0.1";
-	
-	return resp;
+	return new Response(req, ep, status);
+};
+
+exports.createByeRequest = function () {
+	var req = 
 };
