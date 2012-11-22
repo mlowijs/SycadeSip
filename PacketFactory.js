@@ -1,21 +1,30 @@
 var Utils = require("./Utils");
-var Request = require("./Request").Request;
+var Packet = require("./Packet").Packet;
+//var Request = require("./Request").Request;
 var Response = require("./Response").Response;
 
-exports.parseRequest = function (data, callback) {
+exports.parseIncoming = function (data, callback) {
 	var lines = data.split("\r\n");
 	
-	// Set request
-	var reqLine = lines[0].split(" ");
+	// Request/status line
+	var line = lines[0].split(" "),
+		packet = Packet.parse(data, lines);
+			
+	// Is this a response?
+	if (line[0] == "SIP/2.0") {
+		packet.response = {
+			protocol: line[0],
+			statusCode: line[1]
+		};
+	} else {	
+		packet.request = {
+			method: line[0],
+			url: line[1],
+			protocol: line[2]
+		};
+	}
 	
-	var request = {
-		method: reqLine[0],
-		url: reqLine[1],
-		protocol: reqLine[2]
-	};
-	
-	// Parse packet and return
-	return Request.parse(request, data, lines);
+	callback(packet);
 };
 
 exports.createResponse = function (req, ep, status) {	

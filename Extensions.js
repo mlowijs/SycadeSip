@@ -15,3 +15,11 @@ String.prototype.split = function (separator, limit) {
 	// Concat parts that should be joined
 	return newParts.concat(parts.slice(limit - 1).join(separator));
 };
+
+/*
+ * Function
+ */
+Function.prototype.isA = function (parent) {
+	this.prototype = parent;
+	this.prototype.constructor = this;
+};

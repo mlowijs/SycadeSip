@@ -1,9 +1,7 @@
 Dialplan = [
 	{
 		extension: "200",
-		plan: function () {
-			console.log("in dialplan");
-			
+		plan: function () {		
 			// Accept the call
 			this.accept();
 		}

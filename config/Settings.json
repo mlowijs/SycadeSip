@@ -1,4 +1,5 @@
 {
 	"hostname": "localhost",
-	"ipAddresses": [ "127.0.0.1" ]
+	"ipAddresses": [ "127.0.0.1" ],
+	"codecs": [ 0, 8, 101 ]
 }

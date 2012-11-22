@@ -24,7 +24,7 @@ exports.start = function (port) {
 			return;
 		
 		// Parse data into request packet
-		PacketFactory.parseRequest(data, function (req) {
+		PacketFactory.parseIncoming(data, function (req) {
 			if (!self.findPeer(req)) {
 				if (!self.authorize(req, ep)) {
 					var resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
@@ -38,19 +38,22 @@ exports.start = function (port) {
 				}
 			}
 			
-			switch (req.request.method) {
-				case "REGISTER":
-					self.registerReceived(req, ep);
-					break;
-				case "PUBLISH":
-					self.publishReceived(req, ep);
-					break;
-				case "SUBSCRIBE":
-					self.subscribeReceived(req, ep);
-					break;
-				case "INVITE":
-					self.inviteReceived(req, ep);
-					break;
+			// Is this a request?
+			if (req.request) {
+				switch (req.request.method) {
+					case "REGISTER":
+						self.registerReceived(req, ep);
+						break;
+					case "PUBLISH":
+						self.publishReceived(req, ep);
+						break;
+					case "SUBSCRIBE":
+						self.subscribeReceived(req, ep);
+						break;
+					case "INVITE":
+						self.inviteReceived(req, ep);
+						break;
+				}
 			}
 		});
 	});

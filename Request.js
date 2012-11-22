@@ -16,17 +16,6 @@ Request.parse = function (request, data, lines) {
 	// Set content if it exists
 	if (req.headers["Content-Length"] > 0)
 		req.content = data.substr(-req.headers["Content-Length"] + 2);
-		
-	var re, matches;
-	
-	// Authorization
-	if (req.headers["Authorization"]) {
-		req.authorization = {};
-		re = /(\w+)="?([^"]+)/g;
-		
-		while ((matches = re.exec(req.headers["Authorization"])) !== null)
-			req.authorization[matches[1]] = matches[2];
-	}
 	
 	// Interesting properties
 	req.from = Utils.parseAddress(this.headers["From"]);
