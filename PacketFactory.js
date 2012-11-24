@@ -1,6 +1,5 @@
 var Utils = require("./Utils");
 var Packet = require("./Packet").Packet;
-//var Request = require("./Request").Request;
 var Response = require("./Response").Response;
 
 exports.parseIncoming = function (data, callback) {
