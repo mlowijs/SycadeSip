@@ -1,6 +1,7 @@
 var PacketFactory = require("./PacketFactory");
 var SessionDescription = require("./SessionDescription").SessionDescription;
 var Utils = require("./Utils");
+var Response = require("./Response").Response;
 
 var Context = function (server, request, endPoint) {
 	this.server = server;
@@ -18,7 +19,7 @@ Context.prototype.accept = function () {
 	// Create a session description	
 	this.sessionDescription = new SessionDescription(this.request);
 	
-	var resp = PacketFactory.createResponse(this.request, this.endPoint, "200 OK");
+	var resp = new Response(this.request, this.endPoint, "200 OK");
 	resp.headers["To"] = this.request.headers["To"] + ";tag=" + Utils.randomHash();
 	resp.headers["Content-Type"] = "application/sdp";
 	if (this.request.headers["Contact"]) // TODO: fix this
@@ -37,6 +38,7 @@ Context.prototype.call = function (user) {
 };
 
 Context.prototype.end = function () {
+	var req = new Request(this.request);
 
 	this.ended = true;
 };

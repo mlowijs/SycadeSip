@@ -5,6 +5,7 @@ var PacketFactory = require("./PacketFactory");
 var Utils = require("./Utils");
 var Peer = require("./Peer").Peer;
 var Context = require("./Context").Context;
+var Response = require("./Response").Response;
 
 // Configuration files
 require("./config/Dialplan.js");
@@ -27,7 +28,7 @@ exports.start = function (port) {
 		PacketFactory.parseIncoming(data, function (req) {
 			if (!self.findPeer(req)) {
 				if (!self.authorize(req, ep)) {
-					var resp = PacketFactory.createResponse(req, ep, "401 Unauthorized");
+					var resp = new Response(req, ep, "401 Unauthorized");
 					resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 					resp.headers["WWW-Authenticate"] = 'Digest realm="sip", nonce="' +
 						Utils.randomHash() + '"';
@@ -73,7 +74,7 @@ exports.inviteReceived = function (req, ep) {
 			extFound = true;
 			
 			// Send 100 Trying
-			var resp = PacketFactory.createResponse(req, ep, "100 Trying");
+			var resp = new Response(req, ep, "100 Trying");
 			resp.headers["To"] = req.headers["To"];
 			resp.headers["Contact"] = req.headers["Contact"];
 			
@@ -86,7 +87,7 @@ exports.inviteReceived = function (req, ep) {
 	
 	// No extension found, send 404 Not Found
 	if (!extFound) {
-		var resp = PacketFactory.createResponse(req, ep, "404 Not Found");
+		var resp = new Response(req, ep, "404 Not Found");
 		resp.headers["To"] = req.headers["To"];
 		resp.headers["Contact"] = req.headers["Contact"];
 		
@@ -95,21 +96,21 @@ exports.inviteReceived = function (req, ep) {
 };
 
 exports.subscribeReceived = function (req, ep) {	
-	var resp = PacketFactory.createResponse(req, ep, "200 OK");
+	var resp = new Response(req, ep, "200 OK");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
 	this.send(resp);
 };
 
 exports.publishReceived = function (req, ep) {	
-	var resp = PacketFactory.createResponse(req, ep, "489 Bad Event");
+	var resp = new Response(req, ep, "489 Bad Event");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	
 	this.send(resp);
 };
 
 exports.registerReceived = function (req, ep) {
-	var resp = PacketFactory.createResponse(req, ep, "200 OK");
+	var resp = new Response(req, ep, "200 OK");
 	resp.headers["To"] = req.headers["To"] + ";tag=" + Utils.randomHash();
 	resp.headers["Expires"] = 1800;
 	if (req.headers["Contact"]) // TODO: fix this

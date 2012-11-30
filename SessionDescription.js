@@ -13,7 +13,6 @@ SessionDescription.prototype.toString = function () {
 	buffer += "a=rtpmap:0 PCMU/8000\r\n";
 	buffer += "a=rtpmap:8 PCMA/8000\r\n";
 	buffer += "a=rtpmap:101 telephone-event/8000\r\n";
-// 	buffer += "a=fmtp:101 0-15\r\n";
 	buffer += "a=sendrecv";
 	
 	return buffer;

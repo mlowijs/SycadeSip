@@ -1,6 +1,5 @@
 var Utils = require("./Utils");
 var Packet = require("./Packet").Packet;
-var Response = require("./Response").Response;
 
 exports.parseIncoming = function (data, callback) {
 	var lines = data.split("\r\n");
@@ -24,8 +23,4 @@ exports.parseIncoming = function (data, callback) {
 	}
 	
 	callback(packet);
-};
-
-exports.createResponse = function (req, ep, status) {	
-	return new Response(req, ep, status);
 };
